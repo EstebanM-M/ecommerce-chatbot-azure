@@ -155,7 +155,7 @@ ecommerce-chatbot-azure/
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/ecommerce-chatbot-azure.git
+git clone https://github.com/EstebanM-M/ecommerce-chatbot-azure.git
 cd ecommerce-chatbot-azure
 ```
 
@@ -297,9 +297,8 @@ MIT License
 ## 👤 Author
 
 **Esteban Bernal**
-- LinkedIn: [Your LinkedIn]
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Portfolio: [your-portfolio.com]
+- LinkedIn: [Your LinkedIn](https://www.linkedin.com/in/esteban-morales-mahecha/)
+- GitHub: [@EstebanM-M](https://github.com/EstebanM-M)
 
 ## 🙏 Acknowledgments
 
