@@ -297,7 +297,7 @@ MIT License
 ## 👤 Author
 
 **Esteban Bernal**
-- LinkedIn: [Your LinkedIn](https://www.linkedin.com/in/esteban-morales-mahecha/)
+- LinkedIn: [Esteban Morales](https://www.linkedin.com/in/esteban-morales-mahecha/)
 - GitHub: [@EstebanM-M](https://github.com/EstebanM-M)
 
 ## 🙏 Acknowledgments
