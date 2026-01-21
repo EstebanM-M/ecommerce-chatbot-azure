@@ -1,0 +1,99 @@
+# E-commerce Chatbot - Docker Compose Configuration
+# For local development and testing
+
+version: '3.8'
+
+services:
+  # Bot Service
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-bot
+    ports:
+      - "3978:3978"
+    environment:
+      # Azure Bot Configuration (set these in .env file)
+      - MICROSOFT_APP_ID=${MICROSOFT_APP_ID}
+      - MICROSOFT_APP_PASSWORD=${MICROSOFT_APP_PASSWORD}
+      - MICROSOFT_APP_TYPE=${MICROSOFT_APP_TYPE:-MultiTenant}
+      - MICROSOFT_APP_TENANTID=${MICROSOFT_APP_TENANTID}
+      
+      # Database Configuration
+      - SQL_SERVER=${SQL_SERVER}
+      - SQL_DATABASE=${SQL_DATABASE:-ecommerce_chatbot}
+      - SQL_USERNAME=${SQL_USERNAME}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_DRIVER=${SQL_DRIVER:-{ODBC Driver 18 for SQL Server}}
+      
+      # Azure Services (Optional)
+      - AZURE_TEXT_ANALYTICS_KEY=${AZURE_TEXT_ANALYTICS_KEY}
+      - AZURE_TEXT_ANALYTICS_ENDPOINT=${AZURE_TEXT_ANALYTICS_ENDPOINT}
+      - APPINSIGHTS_INSTRUMENTATION_KEY=${APPINSIGHTS_INSTRUMENTATION_KEY}
+      
+      # Bot Settings
+      - BOT_NAME=${BOT_NAME:-E-commerce Support Bot}
+      - BOT_VERSION=${BOT_VERSION:-1.0.0}
+      - USE_PRETRAINED_MODELS=${USE_PRETRAINED_MODELS:-true}
+      - ENABLE_ANALYTICS=${ENABLE_ANALYTICS:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+      # API Settings
+      - API_HOST=${API_HOST:-0.0.0.0}
+      - API_PORT=${API_PORT:-3978}
+      
+    env_file:
+      - .env
+    volumes:
+      - ./bot:/app/bot
+      - ./ml_models:/app/ml_models
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3978/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Streamlit Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-dashboard
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      # Database Configuration
+      - SQL_SERVER=${SQL_SERVER}
+      - SQL_DATABASE=${SQL_DATABASE:-ecommerce_chatbot}
+      - SQL_USERNAME=${SQL_USERNAME}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_DRIVER=${SQL_DRIVER:-{ODBC Driver 18 for SQL Server}}
+      
+      # Streamlit Settings
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      
+    env_file:
+      - .env
+    volumes:
+      - ./dashboard:/app/dashboard
+      - ./bot:/app/bot
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    depends_on:
+      - bot
+
+networks:
+  chatbot-network:
+    driver: bridge
+
+volumes:
+  bot-logs:
+    driver: local

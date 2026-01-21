@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Customer Support - Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+
+        #webchat {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .footer p {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: white;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info-card p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 E-commerce Customer Support</h1>
+            <p>Chat with our AI assistant for instant help</p>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>📦 Track Orders</h3>
+                <p>Get real-time updates on your order status</p>
+            </div>
+            <div class="info-card">
+                <h3>🔍 Find Products</h3>
+                <p>Search and discover the perfect items</p>
+            </div>
+            <div class="info-card">
+                <h3>💡 Get Recommendations</h3>
+                <p>Personalized product suggestions just for you</p>
+            </div>
+            <div class="info-card">
+                <h3>❓ 24/7 Support</h3>
+                <p>Instant answers to your questions anytime</p>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div id="webchat" role="main">
+                <div class="loading">
+                    <p>🔄 Initializing chat... Please wait.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by Azure Bot Framework | E-commerce Chatbot v1.0</p>
+            <p>For urgent matters, call 1-800-555-0123 or email support@ecommerce.com</p>
+        </div>
+    </div>
+
+    <!-- Bot Framework Web Chat -->
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+
+    <script>
+        // IMPORTANT: Replace these values with your actual bot credentials
+        // You can get these from Azure Portal > Your Bot Resource > Channels > Web Chat
+        
+        const BOT_SECRET = 'YOUR_BOT_SECRET_HERE'; // Get this from Azure Portal
+        const BOT_ID = 'YOUR_BOT_ID_HERE'; // Your bot's Microsoft App ID
+
+        // Alternative: Use Direct Line secret (recommended for production)
+        // const DIRECT_LINE_SECRET = 'YOUR_DIRECT_LINE_SECRET';
+
+        // Initialize Web Chat
+        async function initializeChat() {
+            try {
+                // Option 1: Using Direct Line Secret (recommended)
+                // Uncomment this if you're using Direct Line secret
+                /*
+                const res = await fetch('https://directline.botframework.com/v3/directline/tokens/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DIRECT_LINE_SECRET}`
+                    }
+                });
+                
+                const { token } = await res.json();
+                
+                const directLine = window.WebChat.createDirectLine({ token });
+                */
+
+                // Option 2: Using secret directly (for development only)
+                const directLine = window.WebChat.createDirectLine({ 
+                    secret: BOT_SECRET 
+                });
+
+                // Render Web Chat
+                window.WebChat.renderWebChat(
+                    {
+                        directLine: directLine,
+                        userID: 'user_' + Math.random().toString(36).substring(7),
+                        username: 'Customer',
+                        locale: 'en-US',
+                        
+                        // Styling options
+                        styleOptions: {
+                            // Bot bubble
+                            bubbleBackground: '#667eea',
+                            bubbleTextColor: 'white',
+                            bubbleBorderRadius: 10,
+                            bubbleFromUserBackground: '#f0f0f0',
+                            bubbleFromUserTextColor: '#333',
+                            bubbleFromUserBorderRadius: 10,
+                            
+                            // Avatar
+                            botAvatarInitials: '🤖',
+                            userAvatarInitials: '👤',
+                            
+                            // Send box
+                            sendBoxBackground: 'white',
+                            sendBoxTextColor: '#333',
+                            sendBoxButtonColor: '#667eea',
+                            sendBoxButtonColorOnHover: '#764ba2',
+                            
+                            // Suggested actions
+                            suggestedActionBackground: '#667eea',
+                            suggestedActionTextColor: 'white',
+                            suggestedActionBorderRadius: 20,
+                            
+                            // Typography
+                            primaryFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                            
+                            // Misc
+                            backgroundColor: 'white',
+                            subtle: '#999',
+                            accent: '#667eea'
+                        }
+                    },
+                    document.getElementById('webchat')
+                );
+
+                // Send welcome event
+                directLine.postActivity({
+                    from: { id: 'user', name: 'Customer' },
+                    name: 'conversationUpdate',
+                    type: 'conversationUpdate',
+                    membersAdded: [{ id: 'user' }]
+                }).subscribe();
+
+                console.log('✅ Web Chat initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Error initializing chat:', error);
+                document.getElementById('webchat').innerHTML = `
+                    <div class="loading" style="color: #dc3545;">
+                        <p>⚠️ Failed to connect to the bot. Please check your configuration.</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize chat when page loads
+        window.addEventListener('load', initializeChat);
+    </script>
+
+    <!-- Instructions for Development -->
+    <script>
+        // Check if credentials are configured
+        if (BOT_SECRET === 'YOUR_BOT_SECRET_HERE' || BOT_ID === 'YOUR_BOT_ID_HERE') {
+            console.warn(`
+                ⚠️ CONFIGURATION REQUIRED ⚠️
+                
+                Please replace the placeholder values in this HTML file:
+                1. BOT_SECRET: Get this from Azure Portal > Your Bot Resource > Channels > Web Chat
+                2. BOT_ID: Your bot's Microsoft App ID
+                
+                For production, use Direct Line secret instead of Web Chat secret.
+                
+                See README.md for detailed setup instructions.
+            `);
+            
+            document.getElementById('webchat').innerHTML = `
+                <div class="loading" style="color: #ffc107; flex-direction: column;">
+                    <p style="font-size: 1.5em; margin-bottom: 20px;">⚠️ Configuration Required</p>
+                    <p style="max-width: 600px; text-align: center; line-height: 1.6;">
+                        Please configure your bot credentials in this HTML file.
+                        <br><br>
+                        See the browser console (F12) for detailed instructions,
+                        or check the README.md file.
+                    </p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
